@@ -11,7 +11,7 @@ import os
 app = FastAPI()
 
 # Model dosya yolu ve yüklenmesi
-model_path = os.path.abspath("Fire_CNN_api/restFast/model_fire.keras")
+model_path = os.path.abspath("restFast/model_fire.keras")
 if os.path.exists(model_path):
     print(f"Model bulundu: {model_path}")
 else:
