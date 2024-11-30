@@ -2,21 +2,20 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import tensorflow as tf
 import numpy as np
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import requests
 from io import BytesIO
+import os
 
 # FastAPI uygulaması
 app = FastAPI()
 
 # Model dosya yolu ve yüklenmesi
-import os
-
-model_path = r"C:\Users\User\Desktop\restFast\model_fire.keras"
+model_path = os.path.abspath("restFast/model_fire.keras")
 if os.path.exists(model_path):
     print(f"Model bulundu: {model_path}")
 else:
-    print(f"Model bulunamadı: {model_path}")
+    raise RuntimeError(f"Model dosyası bulunamadı: {model_path}")
 
 try:
     model = tf.keras.models.load_model(model_path, safe_mode=False)
@@ -44,7 +43,11 @@ def predict_fire(image_data: ImageURL):
         response = requests.get(image_data.url)
         if response.status_code != 200:
             raise HTTPException(status_code=400, detail="Görsel URL'ine ulaşılamadı.")
-        img = Image.open(BytesIO(response.content))
+        
+        try:
+            img = Image.open(BytesIO(response.content))
+        except UnidentifiedImageError:
+            raise HTTPException(status_code=400, detail="Geçersiz görsel formatı.")
 
         # Görseli işleme (RGB'ye çevirme, boyutlandırma)
         if img.mode != "RGB":
@@ -55,11 +58,17 @@ def predict_fire(image_data: ImageURL):
 
         # Modelden tahmin alma
         prediction = model.predict(img_array)
-        predicted_class = class_labels[np.argmax(prediction)]
+        predicted_index = np.argmax(prediction)
+        predicted_class = class_labels[predicted_index]
+        confidence = float(prediction[0][predicted_index])
         tips = fire_tips[predicted_class]
 
         # Tahmin sonucu döndürme
-        return {"prediction": predicted_class, "tips": tips}
+        return {
+            "prediction": predicted_class,
+            "confidence": f"{confidence:.2f}",
+            "tips": tips
+        }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Tahmin işlemi sırasında hata oluştu: {e}")
