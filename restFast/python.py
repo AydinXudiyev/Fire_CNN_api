@@ -78,6 +78,6 @@ def predict_fire(image_data: ImageURL):
 def read_root():
     return {"message": "Fire and Non-Fire sınıflandırma API'si çalışıyor!"} 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))  # Portu ortama göre al, yoksa 8000 olarak ayarla
     uvicorn.run(app, host="0.0.0.0", port=port)
