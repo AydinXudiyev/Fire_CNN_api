@@ -1,3 +1,5 @@
+import os
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import tensorflow as tf
@@ -5,8 +7,6 @@ import numpy as np
 from PIL import Image, UnidentifiedImageError
 import requests
 from io import BytesIO
-import os
-import uvicorn
 
 # FastAPI uygulaması
 app = FastAPI()
@@ -77,8 +77,7 @@ def predict_fire(image_data: ImageURL):
 # Ana sayfa
 @app.get("/")
 def read_root():
-    return {"message": "Fire and Non-Fire sınıflandırma API'si çalışıyor!"} 
+    return {"message": "Fire and Non-Fire sınıflandırma API'si çalışıyor!"}
 
-if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))  # Portu ortama göre al, yoksa 8000 olarak ayarla
-    uvicorn.run(app, host="0.0.0.0", port=port)
+# Render ortamı için 'uvicorn' komutunun dışarıdan çalıştırılması
+# Render bu komutu kendi başına çalıştırır, bu yüzden 'if __name__ == "__main__":' kısmını kaldırabilirsiniz.
