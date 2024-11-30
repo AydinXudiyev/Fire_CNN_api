@@ -6,6 +6,7 @@ from PIL import Image, UnidentifiedImageError
 import requests
 from io import BytesIO
 import os
+import uvicorn
 
 # FastAPI uygulaması
 app = FastAPI()
@@ -80,4 +81,4 @@ def read_root():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))  # Portu ortama göre al, yoksa 8000 olarak ayarla
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=port)
